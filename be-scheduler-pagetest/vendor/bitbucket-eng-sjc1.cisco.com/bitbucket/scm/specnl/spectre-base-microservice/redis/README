@@ -1,0 +1,113 @@
+ABOUT:
+
+- Wrapper is used to connect to Redis.
+- Wrapper hasn't been tested with Elasticache yet.
+- key will be a combination of customerid.servicename.key
+- CustomeriD and Servicename aren't mandatory at this time
+- Deletion of values for a customer is not supported yet
+- Redis supports mutliple types. Only String is supported. Rest of them are in testing still
+- Some of the function names have changed from hazelcast implementation
+- GetMulti and SetMulti aren't supported with this version
+
+INSTALLATION:
+
+Installation of redis is not covered under this document. Redis can be installed manually by downloading from the site for testing. Also, SJC3 team has been deploying on development enviornment. They can help with the deployment.
+
+Prerequisities are:
+- Redis has been installed and running.
+- golang installed
+- gopath is defined
+
+Following libraries were evaluated to build this wrapper
+
+1.) Redigo
+2.) go-redis
+
+Many sites point to better performance with Redigo and also redigo has been active recently. Hence redigo is library of choice.
+
+
+Redigo Url :- https://github.com/garyburd/redigo
+
+
+There is one non-standard library that is required for the code and test. Please execute this:
+
+go get -u go get github.com/garyburd/redigo/redis
+
+Features supported with this version of wrapper are
+
+1.) Set String
+2.) Get String
+3.) Get Keys based on key pattern
+4.) Delete key
+5.) Set String with expiration
+6.) Get time to live
+7.) Lookup for a string
+8.) Clear all the objects in cache
+
+Process to use this library
+
+- Get cache connection object by executing function redis.CreateConn. Connect String and Service Name are passed as attributes
+- Set customerid on the connection object, if required
+- Execute required method like SetString
+- Close connection by calling cache.Close()
+
+
+Code snippet for testing
+
+
+/*
+cache,err := redis.CreateConn("localhost:6379", "test")
+cache.SetCustomerId( "yahoo")
+err = cache.SetString("country", "india")
+// cache,err = redis.CreateConn("localhost:6379", "test")
+if( err == nil){
+  if val1, err1 := cache.GetString("country"); err1 != nil {
+    fmt.Println("GET ==================", val1, err1)
+  }
+}else{
+  fmt.Println("in main function ", err)
+}
+
+err1 := cache.SetStringWithExpiration("sports", "tennis", 10)
+if( err1 == nil){
+  if val1, err1 := cache.GetString("sports"); err1 != nil {
+    fmt.Println("GET string 2 ==================", val1, err1)
+  }
+  time.Sleep( 10000)
+  ttl,_ := cache.GetTimeToLive("sports")
+  fmt.Println("GET string 2 ==================", ttl)
+}else{
+  fmt.Println("in main function ", err)
+}
+
+val, err := cache.Lookup("sports")
+
+if( val){
+  fmt.Println("Lookup for sports is successful")
+}
+
+err = cache.Delete("country")
+if val1, err1 := cache.GetString("country"); err1 == nil {
+  fmt.Println("GET string 2 ==================", val1, err1)
+}
+
+err1 = cache.ClearAll()
+val, err = cache.Lookup("sports")
+
+if err != nil {
+  fmt.Println( "Lookup for sports is not successful 1 ", err)
+} else {
+  fmt.Println( "Lookup was successful 1 ")
+}
+
+
+cache.Close()
+
+val, err = cache.Lookup("sports")
+
+if err != nil {
+  fmt.Println( "Lookup for sports is not successful", err)
+} else {
+  fmt.Println( "Lookup was successful")
+}
+*/

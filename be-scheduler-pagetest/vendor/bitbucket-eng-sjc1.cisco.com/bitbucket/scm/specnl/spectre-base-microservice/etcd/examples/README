@@ -1,0 +1,16 @@
+This folder contains an example using the etcd package with ssl. To run this we need a etcd cluster with ssl enabled.
+
+
+To test it in a docker environment:
+The docker-compose file will build the containers, run an etcd cluster of 3 containers with ssl enabled and run the sample code in etcd_ssl.go.
+
+Navigate one level up: cd ../../
+
+run it:
+docker-compose -f etc-ssl-docker-compose.yml up
+
+To stop it:
+docker-compose -f etc-ssl-docker-compose.yml stop
+
+To remove it:
+docker-compose -f etc-ssl-docker-compose.yml rm -f

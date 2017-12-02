@@ -1,0 +1,66 @@
+The etcd package can be imported and consumed from other golang packages.
+
+
+To test it in a docker environment:
+The docker-compose file will build the containers and generate a junit compliant xml report and a coverage report in xml which jenkins will understand
+Navigate one level up: cd ..
+
+To run it:
+docker-compose -f etc-docker-compose.yml up
+
+To stop it:
+docker-compose -f etc-docker-compose.yml stop
+
+To remove it:
+docker-compose -f etc-docker-compose.yml rm -f
+
+
+
+
+To test locally:
+The prerequisites for testing this project locally are:
+- an etcd instance running.
+- golang is installed (if you have not already: https://golang.org/dl/)
+- gopath is defined (if you have not already: https://golang.org/doc/code.html#GOPATH)
+
+
+Then this "etcd" folder should be copied into your $GOPATH.
+
+Also we need a few libraries to run the code and test. Please execute these:
+go get -u github.com/coreos/etcd/client
+go get -u github.com/Sirupsen/logrus
+go get -u golang.org/x/net/context
+go get -u github.com/stretchr/testify
+go get -u github.com/jstemmer/go-junit-report
+go get -u github.com/axw/gocov/...
+go get -u github.com/AlekSi/gocov-xml
+
+
+To get a local etcd instance in docker, run this command:
+docker run -d -p 4001:4001 -p 2380:2380 -p 2379:2379 --name etcd quay.io/coreos/etcd:latest  -advertise-client-urls http://localhost:2379,http://localhost:4001  -listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001  -initial-advertise-peer-urls http://localhost:2380  -listen-peer-urls http://0.0.0.0:2380  -initial-cluster-token etcd-cluster-1  -initial-cluster default=http://localhost:2380  -initial-cluster-state new
+
+
+My code is configured to work with the cluster, hence to test it locally we need to change these lines in etcd_test.go file:
+
+From:
+[]string{"http://etcd0:2379"},
+//		[]string{"http://localhost:4001"},
+
+To:
+// []string{"http://etcd0:2379"},
+[]string{"http://localhost:4001"},
+
+
+Then navigate into "etcd" folder (in a terminal using cd).
+
+Then to run the tests execute:
+go test
+
+Then to view code coverage execute:
+go test -cover
+
+To generate junit compliant test report execute:
+go test -v | go-junit-report > report.xml
+
+To generate coverage report which jenkins can understand:
+gocov test | gocov-xml > coverage.xml

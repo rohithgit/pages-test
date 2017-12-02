@@ -1,0 +1,5 @@
+version: '2'
+services:
+ logging:
+    build: logging/
+    command: sh -c "go test -v | go-junit-report > report.xml && gocov test | gocov-xml > coverage.xml && echo -e '\n\nReport xml:\n' && cat report.xml && echo -e '\n\nCoverage xml:\n' && cat coverage.xml"

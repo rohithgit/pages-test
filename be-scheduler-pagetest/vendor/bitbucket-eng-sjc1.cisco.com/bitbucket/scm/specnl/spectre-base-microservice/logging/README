@@ -1,0 +1,43 @@
+The logging package can be imported and consumed from other golang packages.
+
+
+To test it in a docker environment:
+The docker-compose file will build the containers and generate a junit compliant xml report and a coverage report in xml which jenkins will understand
+Navigate one level up: cd ..
+
+run it:
+docker-compose -f logging-docker-compose.yml up
+
+To stop it:
+docker-compose -f logging-docker-compose.yml stop
+
+To remove it:
+docker-compose -f logging-docker-compose.yml rm -f
+
+To test locally:
+The prerequisites for testing this project locally are:
+- golang is installed (if you have not already: https://golang.org/dl/)
+- gopath is defined (if you have not already: https://golang.org/doc/code.html#GOPATH)
+
+
+Then this "logging" folder should be copied into your $GOPATH.
+
+Also we need a few libraries to run the code and test. Please execute these:
+go get -u github.com/Sirupsen/logrus
+go get -u github.com/stretchr/testify
+go get -u github.com/jstemmer/go-junit-report
+go get -u github.com/axw/gocov/...
+go get -u github.com/AlekSi/gocov-xml
+
+
+Then to run the tests execute:
+go test
+
+Then to view code coverage execute:
+go test -cover
+
+To generate junit compliant test report execute:
+go test -v | go-junit-report > report.xml
+
+To generate coverage report which jenkins can understand:
+gocov test | gocov-xml > coverage.xml

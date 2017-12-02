@@ -1,0 +1,97 @@
+version: '2'
+services:
+  etcd0.cisco.com:
+    build: etcd/examples/
+    hostname: etcd0.cisco.com
+    container_name: etcdN0
+    expose: [ "4001", "2380", "2379" ]
+    # image: quay.io/coreos/etcd:latest
+    command: >
+      --name 'etcd0'
+      --advertise-client-urls 'https://etcd0.cisco.com:4001,https://etcd0.cisco.com:2379'
+      --listen-client-urls 'https://0.0.0.0:4001,https://0.0.0.0:2379'
+      --initial-advertise-peer-urls 'https://etcd0.cisco.com:2380'
+      --listen-peer-urls 'https://0.0.0.0:2380'
+      --initial-cluster-token 'spectre-etcd'
+      --initial-cluster etcd0=https://etcd0.cisco.com:2380,etcd1=https://etcd1.cisco.com:2380,etcd2=https://etcd2.cisco.com:2380
+      --cert-file '/certs/etcd.cisco.com.crt'
+      --key-file '/certs/etcd.cisco.com.key'
+      --trusted-ca-file '/certs/ca.crt'
+      --client-cert-auth
+      --peer-cert-file '/certs/etcd.cisco.com.crt'
+      --peer-key-file '/certs/etcd.cisco.com.key'
+      --peer-trusted-ca-file '/certs/ca.crt'
+      --peer-client-cert-auth
+      --initial-cluster-state new
+  etcd1.cisco.com:
+    # build: .
+    image: spectrebasemicroservice_etcd0.cisco.com
+    hostname: etcd1.cisco.com
+    container_name: etcdN1
+    # image: quay.io/coreos/etcd:latest
+    expose: [ "4001", "2380", "2379" ]
+    depends_on:
+      - etcd0.cisco.com
+    external_links:
+      - etcd0.cisco.com:etcd0.cisco.com
+    command: >
+      --name 'etcd1'
+      --advertise-client-urls 'https://etcd1.cisco.com:4001,https://etcd1.cisco.com:2379'
+      --listen-client-urls 'https://0.0.0.0:4001,https://0.0.0.0:2379'
+      --initial-advertise-peer-urls 'https://etcd1.cisco.com:2380'
+      --listen-peer-urls 'https://0.0.0.0:2380'
+      --initial-cluster-token 'spectre-etcd'
+      --initial-cluster etcd0=https://etcd0.cisco.com:2380,etcd1=https://etcd1.cisco.com:2380,etcd2=https://etcd2.cisco.com:2380
+      --cert-file '/certs/etcd.cisco.com.crt'
+      --key-file '/certs/etcd.cisco.com.key'
+      --trusted-ca-file '/certs/ca.crt'
+      --client-cert-auth
+      --peer-cert-file '/certs/etcd.cisco.com.crt'
+      --peer-key-file '/certs/etcd.cisco.com.key'
+      --peer-trusted-ca-file '/certs/ca.crt'
+      --peer-client-cert-auth
+      --initial-cluster-state new
+  etcd2.cisco.com:
+    # build: .
+    image: spectrebasemicroservice_etcd0.cisco.com
+    hostname: etcd2.cisco.com
+    container_name: etcdN2
+    # image: quay.io/coreos/etcd:latest
+    expose: [ "4001", "2380", "2379" ]
+    depends_on:
+      - etcd0.cisco.com
+      - etcd1.cisco.com
+    external_links:
+      - etcd0.cisco.com:etcd0.cisco.com
+      - etcd1.cisco.com:etcd1.cisco.com
+    command: >
+      --name 'etcd2'
+      --advertise-client-urls 'https://etcd2.cisco.com:4001,https://etcd2.cisco.com:2379'
+      --listen-client-urls 'https://0.0.0.0:4001,https://0.0.0.0:2379'
+      --initial-advertise-peer-urls 'https://etcd2.cisco.com:2380'
+      --listen-peer-urls 'https://0.0.0.0:2380'
+      --initial-cluster-token 'spectre-etcd'
+      --initial-cluster etcd0=https://etcd0.cisco.com:2380,etcd1=https://etcd1.cisco.com:2380,etcd2=https://etcd2.cisco.com:2380
+      --cert-file '/certs/etcd.cisco.com.crt'
+      --key-file '/certs/etcd.cisco.com.key'
+      --trusted-ca-file '/certs/ca.crt'
+      --client-cert-auth
+      --peer-cert-file '/certs/etcd.cisco.com.crt'
+      --peer-key-file '/certs/etcd.cisco.com.key'
+      --peer-trusted-ca-file '/certs/ca.crt'
+      --peer-client-cert-auth
+      --initial-cluster-state new
+  etcd-ssl:
+    build:
+      context: etcd/
+      dockerfile: Dockerfile_etcd_ssl_example
+    command: sh -c "sleep 5 && go run examples/etcd_ssl.go"
+#    command: go test -v
+    depends_on:
+      - etcd0.cisco.com
+      - etcd1.cisco.com
+      - etcd2.cisco.com
+    external_links:
+      - etcd0.cisco.com:etcd0.cisco.com
+      - etcd1.cisco.com:etcd1.cisco.com
+      - etcd2.cisco.com:etcd2.cisco.com

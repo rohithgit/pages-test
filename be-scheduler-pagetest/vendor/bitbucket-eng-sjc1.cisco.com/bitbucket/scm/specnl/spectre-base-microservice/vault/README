@@ -1,0 +1,60 @@
+This client has been developed by hashicorp
+It has a Mozilla Public License, version 2.0
+You can use it and modify the code as much as you want.
+
+Requirements:
+
+Preinstalled software:
+    1. Installed golang
+    2. Installed and configured vault with connectivity to your project.
+
+Golang project:
+    1. Create your workspace
+    2. Setup the GOPATH environment variable
+
+Vault client:
+    Vault API gives you full access to the Vault
+    !!! You need to prepare your Config struct to start your client !!!
+    Check the line 35 in client.go for more details 
+
+Transport:
+    The API is expected to be accessed over a TLS connection at all times,
+    with a valid certificate that is verified by a vault client.
+
+Unsealed:
+    Unsealing is done via an unauthenticated unseal API.
+    This API takes a single master shard and progresses the unsealing process. 
+    Once all shards are given, the Vault is either unsealed or
+    resets the unsealing process if the key was invalid.
+
+Authentication:
+    Once the Vault is unsealed, every other operation requires authentication. There are multiple methods for authentication that can be enabled
+    Authentication is done with the login endpoint. The login endpoint returns an access token that is set as the X-Vault-Token header.
+
+
+That should be enough to connect to the vault
+For more information please refer to the Vault spec which can be found :
+https://github.com/hashicorp/vault/blob/master/api/SPEC.md
+
+######################## T E S T ########################
+
+go test
+go test -cover
+
+#-------------------------------------------------------#
+# go get -u github.com/jstemmer/go-junit-report         #
+# !!!  copy the executables to /usr/local/go/bin !!!    #
+#-------------------------------------------------------#
+
+go test -v | go-junit-report > report.xml
+
+#-------------------------------------------------------#
+# go get github.com/axw/gocov/...                       #
+# go get github.com/AlekSi/gocov-xml                    #
+# !!! copy the executables to /usr/local/go/bin !!!     #
+#-------------------------------------------------------#
+
+gocov test | gocov-xml > coverage.xml
+
+#-------------------------------------------------------#
+

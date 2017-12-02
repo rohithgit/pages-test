@@ -1,0 +1,6 @@
+FROM golang:1.6.0-alpine
+RUN apk add --update git
+ADD . $GOPATH/src/bitbucket-eng-sjc1.cisco.com/bitbucket/scm/specnl/spectre-base-microservice
+WORKDIR $GOPATH/src/bitbucket-eng-sjc1.cisco.com/bitbucket/scm/specnl/spectre-base-microservice/service_discovery/
+RUN go get -u "github.com/benschw/dns-clb-go/clb"
+RUN go get -u "github.com/Sirupsen/logrus"

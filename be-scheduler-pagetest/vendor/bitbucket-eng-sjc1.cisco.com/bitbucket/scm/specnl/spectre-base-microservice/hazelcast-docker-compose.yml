@@ -1,0 +1,12 @@
+hazelcast1:
+  hostname: hazelcast1
+  container_name: hazelcastN1
+  image: hazelcast/hazelcast:3.6.1
+  ports: [ "5701:5701" ]
+  command: java -cp /opt/hazelcast/hazelcast-all-3.6.1.jar -Dhazelcast.memcache.enabled=true -server com.hazelcast.core.server.StartServer
+hazelcast2:
+  hostname: hazelcast2
+  container_name: hazelcastN2
+  image: hazelcast/hazelcast:3.6.1
+  ports: [ "5702:5701" ]
+  command: java -cp /opt/hazelcast/hazelcast-all-3.6.1.jar -Dhazelcast.memcache.enabled=true -server com.hazelcast.core.server.StartServer

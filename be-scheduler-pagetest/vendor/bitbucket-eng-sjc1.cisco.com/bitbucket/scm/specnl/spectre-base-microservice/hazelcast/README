@@ -1,0 +1,54 @@
+ABOUT:
+
+This is a memcache client library which can connect to hazelcast cluster. The package can be imported and consumed from other golang packages.
+
+
+INSTALLATION:
+
+Run the docker-compose file. Currently, the hazelcast-docker-compose has a cluster of hazelcast comprising of 2 nodes. You can add more in similar way
+
+For instance -- 
+hazelcastN:
+  hostname: hazelcastN
+  container_name: hazelcastNN
+  image: hazelcast/hazelcast
+  ports: [ "5702:5701" ]
+  command: java -cp /opt/hazelcast/hazelcast-all-3.6.1.jar -Dhazelcast.memcache.enabled=true -server com.hazelcast.core.server.StartServer
+
+Run it --
+docker-compose -f hazelcast-docker-compose.yml up
+
+You have your docker with hazelcast cluster containers.
+
+To test the hazelcast client --
+
+Prerequisities are:
+- active and running hazelcast cluster
+- golang installed
+- gopath is defined
+
+There is one non-standard library that is required for the code and test. Please execute this:
+
+go get -u github.com/bradfitz/gomemcache/memcache 
+
+To get ip address of your hazelcast clusters run this:
+docker inspect -f '{{.NetworkSettings.IPAddress }}' $(docker ps -aq)
+
+To test this with your cluster you will have to edit the parameters passed to string array like this
+in client_test.go. You can add/remove from inside the {"<ip:port>"}
+
+var args []string = []string{"172.17.0.2:5701", "172.17.0.3:5701"}
+
+Navigate to the hazelcast folder
+
+Run the tests:
+go test
+
+View Code Coverage:
+go test -cover
+
+To generate junit compliant test report execute:
+go test -v | go-junit-report > report.xml
+
+To generate coverage report which jenkins can understand:
+go test | gocov-xml > coverage.xml

@@ -1,0 +1,61 @@
+version: '2'
+services:
+  etcd0:
+    hostname: etcd0
+    container_name: etcdN0
+    image: quay.io/coreos/etcd:latest
+    expose: [ "4001", "2380", "2379" ]
+    command: >
+      --name 'etcd0'
+      --advertise-client-urls 'http://etcd0:4001,http://etcd0:2379'
+      --listen-client-urls 'http://0.0.0.0:4001,http://0.0.0.0:2379'
+      --initial-advertise-peer-urls 'http://etcd0:2380'
+      --listen-peer-urls 'http://0.0.0.0:2380'
+      --initial-cluster-token 'spectre-etcd'
+      --initial-cluster etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380
+      --initial-cluster-state new
+  etcd1:
+    hostname: etcd1
+    container_name: etcdN1
+    image: quay.io/coreos/etcd:latest
+    expose: [ "4001", "2380", "2379" ]
+    depends_on:
+      - etcd0
+    command: >
+      --name 'etcd1'
+      --advertise-client-urls 'http://etcd1:4001,http://etcd1:2379'
+      --listen-client-urls 'http://0.0.0.0:4001,http://0.0.0.0:2379'
+      --initial-advertise-peer-urls 'http://etcd1:2380'
+      --listen-peer-urls 'http://0.0.0.0:2380'
+      --initial-cluster-token 'spectre-etcd'
+      --initial-cluster etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380
+      --initial-cluster-state new
+  etcd2:
+    hostname: etcd2
+    container_name: etcdN2
+    image: quay.io/coreos/etcd:latest
+    expose: [ "4001", "2380", "2379" ]
+    depends_on:
+      - etcd0
+      - etcd1
+    command: >
+      --name 'etcd2'
+      --advertise-client-urls 'http://etcd2:4001,http://etcd2:2379'
+      --listen-client-urls 'http://0.0.0.0:4001,http://0.0.0.0:2379'
+      --initial-advertise-peer-urls 'http://etcd2:2380'
+      --listen-peer-urls 'http://0.0.0.0:2380'
+      --initial-cluster-token 'spectre-etcd'
+      --initial-cluster etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380
+      --initial-cluster-state new
+  etcd:
+    build: etcd/
+    command: sh -c "go test -v | go-junit-report > report.xml && gocov test | gocov-xml > coverage.xml && echo -e '\n\nReport xml:\n' && cat report.xml && echo -e '\n\nCoverage xml:\n' && cat coverage.xml"
+#    command: go test -v
+    depends_on:
+      - etcd0
+      - etcd1
+      - etcd2
+    external_links:
+      - etcd0:etcd0
+      - etcd1:etcd1
+      - etcd2:etcd2
